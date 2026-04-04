@@ -19,7 +19,7 @@ public class AegisSecurityEngine {
 
     public static void main(String[] args) {
         try {
-            String myPrompt = "BTS update 2026";
+            String myPrompt = "LOVE MYSELF";
             String mySecret = "Aegis_Private_Key_2026";
             String signature = generateSignature(myPrompt, mySecret);
 
