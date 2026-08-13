@@ -39,3 +39,10 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Prevent pushing the heavy ML models (Optional, but highly recommended)
+src/main/resources/DistilBERT.onnx
+src/main/resources/vocab.txt
+src/main/resources/test.http
+src/main/resources/tokenizor.json
+C:\Users\Chetana\IdeaProjects\AegisDevGateway\src\main\java\com\aegis\gateway\data.json

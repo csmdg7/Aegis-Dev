@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AEGIS-DEV: Distributed Security Enclave</title>
+    <style>
+        body {
+            background-color: #0F172A;
+            color: #E2E8F0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            width: 90%;
+            max-width: 1200px;
+        }
+        .header h1 {
+            color: #4ADE80;
+            margin: 0;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+        }
+        .header h3 {
+            color: #94A3B8;
+            margin: 10px 0;
+            font-weight: 400;
+        }
+        .header p {
+            color: #64748B;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .container {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            gap: 20px;
+            background-color: #1E293B;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border-top: 4px solid #0D9488;
+        }
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        h2 { color: #14B8A6; margin-top: 0; }
+        textarea {
+            background-color: #0F172A;
+            color: #E2E8F0;
+            border: 1px solid #334155;
+            padding: 15px;
+            border-radius: 5px;
+            height: 120px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+        }
+        textarea:focus {
+            border-color: #0D9488;
+        }
+        button {
+            background-color: #0D9488;
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover { background-color: #0F766E; }
+        button:disabled { background-color: #475569; cursor: not-allowed; }
+        .terminal {
+            background-color: #000000;
+            border: 2px solid #0D9488;
+            padding: 20px;
+            border-radius: 5px;
+            height: 350px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            color: #4ADE80;
+            white-space: pre-wrap;
+        }
+        .terminal-header {
+            color: #64748B;
+            font-size: 12px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #334155;
+            padding-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>AEGIS-DEV</h1>
+    <h3>A Proactive Security Enclave for Agentic AI Workflows</h3>
+    <p>Department of Computer Science and Engineering | Sai Vidya Institute of Technology</p>
+</div>
+
+<div class="container">
+    <!-- Left Panel: Input -->
+    <div class="panel">
+        <h2>Target Agentic AI Payload</h2>
+        <textarea id="promptInput" placeholder="Enter LLM Prompt here (e.g., 'Write a python script to calculate the first 10 prime numbers')..."></textarea>
+        <button id="transmitBtn" onclick="transmitPayload()">TRANSMIT TO TIER-1</button>
+    </div>
+
+    <!-- Right Panel: Output -->
+    <div class="panel">
+        <div class="terminal" id="terminalOutput">
+            <div class="terminal-header">
+                <span>NODE 1 (GATEWAY) TELEMETRY</span>
+                <span>STATUS: SECURE</span>
+            </div>
+            <span id="consoleText">System Idle. Zero-Trust protocol engaged. Ready for input...</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SECRET_KEY = "YOUR_HMAC_SECRET_KEY_HERE";
+
+    async function generateHMAC(message) {
+        const encoder = new TextEncoder();
+        const keyData = encoder.encode(SECRET_KEY);
+        const messageData = encoder.encode(message);
+
+        const cryptoKey = await window.crypto.subtle.importKey(
+            'raw', keyData, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']
+        );
+
+        const signature = await window.crypto.subtle.sign('HMAC', cryptoKey, messageData);
+        return btoa(String.fromCharCode(...new Uint8Array(signature)));
+    }
+
+    async function transmitPayload() {
+        const promptText = document.getElementById("promptInput").value.trim();
+        const consoleText = document.getElementById("consoleText");
+        const btn = document.getElementById("transmitBtn");
+
+        if (!promptText) {
+            consoleText.innerHTML = "❌ [ERROR] Payload cannot be empty.";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "TRANSMITTING...";
+        consoleText.innerHTML = "Initiating Zero-Trust transmission to Tier-1 Gateway...\nCalculating HMAC-SHA256 Cryptographic Signature...\nSignature Generated. Contacting Java Spring Boot Server...";
+
+        try {
+            const signature = await generateHMAC(promptText);
+
+            const response = await fetch('http://localhost:8080/api/gateway/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: promptText, signature: signature })
+            });
+
+            const responseText = await response.text();
+
+            if (response.status === 200) {
+                consoleText.innerHTML = `✅ [200 OK] SUCCESS\n\n${responseText}`;
+            } else if (response.status === 403) {
+                consoleText.innerHTML = `🛑 [403 FORBIDDEN] THREAT INTERCEPTED\n\n${responseText}`;
+            } else if (response.status === 401) {
+                consoleText.innerHTML = `❌ [401 UNAUTHORIZED] HMAC MISMATCH\n\n${responseText}`;
+            } else {
+                consoleText.innerHTML = `⚠️ [${response.status}] SERVER FAULT\n\n${responseText}`;
+            }
+        } catch (error) {
+            consoleText.innerHTML = `❌ FATAL NETWORK ERROR: Cannot reach Gateway. Ensure IntelliJ is running.\n${error}`;
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "TRANSMIT TO TIER-1";
+        }
+    }
+</script>
+
+</body>
+</html>

@@ -19,8 +19,8 @@ public class AegisSecurityEngine {
 
     public static void main(String[] args) {
         try {
-            String myPrompt = "LOVE MYSELF";
-            String mySecret = "Aegis_Private_Key_2026";
+            String myPrompt = "Write a python script to calculate the first 5 prime numbers";
+            String mySecret = "YOUR_HMAC_SECRET_KEY_HERE";
             String signature = generateSignature(myPrompt, mySecret);
 
             System.out.println("--- AEGIS GATEWAY SECURITY CHECK ---");
